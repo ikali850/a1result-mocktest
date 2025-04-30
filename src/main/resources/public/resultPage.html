@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${examTitle}+' - exam.a1result.in '">Mock Test Result</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .result-card {
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+        }
+
+        .card-header {
+            font-weight: bold;
+            background-color: green;
+            color: white;
+            padding: 10px;
+        }
+
+        .graph-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .badge-custom-correct {
+            background-color: #28a745;
+            color: white;
+            font-size: 1rem;
+            padding: 6px 12px;
+            border-radius: 5px;
+        }
+
+        .badge-custom-wrong {
+            background-color: #dc3545;
+            color: white;
+            font-size: 1rem;
+            padding: 6px 12px;
+            border-radius: 5px;
+        }
+
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .answer-block {
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .answer-label {
+            font-weight: 500;
+            margin-right: 5px;
+        }
+
+        .logo-img {
+            height: 4.6em;
+            /* Match roughly the height of an <h2> */
+            width: auto;
+            /* Maintain aspect ratio */
+            border-radius: 50%;
+            /* Circular image */
+            object-fit: cover;
+            /* Ensure proper cropping */
+            background-color: white;
+            /* Optional, good for transparent logos */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-2" id="result-section">
+
+        <!-- Header -->
+        <div class="bg-success text-white p-4 rounded d-flex justify-content-center">
+            <!-- Mobile View: Logo + Title (visible only on small screens) -->
+            <div class="d-block d-md-none text-center mb-3">
+                <a href="https://a1result.in">
+                    <img src="/img/default.svg" alt="Mobile Logo" class="logo-img mb-2">
+                </a>
+                <h2 class="fw-bold" th:text="${examTitle}">Mock Exam Results</h2>
+            </div>
+
+            <!-- Desktop View: Logo + Title Side-by-Side (visible only on md and up) -->
+            <div class="d-none d-md-flex align-items-center justify-content-center text-center">
+                <a href="https://a1result.in" class="me-3">
+                    <img src="/img/default.svg" alt="Desktop Logo" class="logo-img">
+                </a>
+                <div>
+                    <h2 class="fw-bold mx-1" th:text="${examTitle}">Mock Exam Results</h2>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Description -->
+        <div class="mt-3">
+            <div class="align-items-center d-flex flex-wrap">
+                <b class="me-2 fw-bold p-1" style="border-bottom: 3px solid red;">Description:</b>
+                <p class="p-1 text-info mb-0" th:text="${examDescription}">This is a sample exam description.
+                </p>
+            </div>
+
+            <!-- Start and End Time -->
+            <div class="d-flex justify-content-left mt-3 gap-4 fw-bold">
+                <div>
+                    <i class="fas fa-hourglass-start me-1"></i>
+                    <span th:text="'Start: ' + ${startTimeFormatted}">Start Time</span>
+                </div>
+                <div>
+                    <i class="fas fa-hourglass-end me-1"></i>
+                    <span th:text="'Finish : ' + ${endTimeFormatted}">End Time</span>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <!-- Overall Result and Graph -->
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <div class="card result-card text-center position-relative">
+                    <div class="card-header">
+                        <h5>Overall Result</h5>
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <!-- Celebration Message -->
+                        <div class="alert alert-success fw-bold fs-6 mb-3" role="alert">
+                            🎉 Hurray! You have successfully completed the test on <strong><a
+                                    href="https://exam.a1result.in">exam.a1result.in</a></strong> 🎓
+                        </div>
+
+                        <p class="h3" th:text="${percentage + '%'}">85%</p>
+                        <p class="lead text-success fw-bold" th:text="${resultStatus}"><b>Pass</b></p>
+                        <p>
+                            <i class="fas fa-clock me-1"></i>
+                            <span th:text="${totalExamTime} + ' Minutes'">45 Minutes</span>
+                        </p>
+                        <a class="btn btn-primary" th:href="@{/mock/test/reset(examName=${examUrl})}">Retry Test</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card result-card text-center">
+                    <div class="card-header">
+                        <h5>Performance Chart</h5>
+                    </div>
+                    <div class="card-body graph-container">
+                        <canvas id="performanceChart" style="max-height: 200px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="correctAnswers" th:value="${correctAnswers}" />
+        <input type="hidden" id="incorrectAnswers" th:value="${incorrectAnswers}" />
+
+        <!-- Detailed Performance Section -->
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <div class="card result-card text-center">
+                    <div class="card-header">
+                        <h5>Questions Attempted</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="h3" th:text="${attemptedQuestions}">20</p>
+                        <i class="fas fa-check-circle text-success" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card result-card text-center">
+                    <div class="card-header">
+                        <h5>Correct Answers</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="h3" th:text="${correctAnswers}">15</p>
+                        <i class="fas fa-check text-success" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card result-card text-center">
+                    <div class="card-header">
+                        <h5>Incorrect Answers</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="h3" th:text="${incorrectAnswers}">5</p>
+                        <i class="fas fa-times text-danger" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Breakdown -->
+        <div class="card result-card mb-4">
+            <div class="card-header">
+                <h5>Question Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="answer, iterStat : ${answerList}">
+                        <div class="question-title">
+                            <span th:text="${iterStat.index + 1}">1</span>
+                            <span th:text="${answer.question}">Sample Question</span>
+                        </div>
+                        <div class="answer-block">
+                            <div>
+                                <span class="answer-label"><b>Correct Answer:</b></span>
+                                <span th:text="${answer.correctAnswer}">Correct Answer</span>
+                            </div>
+                            <div>
+                                <span class="answer-label"><b>Your Answer:</b></span>
+                                <span th:text="${answer.selectedOption}">Your Answer</span>
+                                <span th:if="${answer.isCorrect()}">
+                                    <i class="fas fa-check text-success" style="font-size: 25px;"></i>
+                                </span>
+                                <span th:unless="${answer.isCorrect()}">
+                                    <i class="fas fa-times text-danger" style="font-size: 25px;"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="container mt-2">
+            <div class="row">
+                <!-- Left Column: General Tips -->
+                <div class="col-md-6 mb-4">
+                    <div class="card result-card h-100">
+                        <div class="card-header">
+                            <h5>General Tips for Improvement</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <i class="fas fa-lightbulb text-warning me-2"></i> Read all questions carefully
+                                    before answering.
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-lightbulb text-warning me-2"></i> Manage your time efficiently
+                                    during the exam.
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-lightbulb text-warning me-2"></i> Focus on strengthening your weak
+                                    areas through regular practice.
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-lightbulb text-warning me-2"></i> Attempt mock tests frequently to
+                                    build confidence and speed.
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-lightbulb text-warning me-2"></i> Revise important topics regularly
+                                    for better retention.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Feedback Form -->
+                <div class="col-md-6 mb-4">
+                    <div class="card result-card h-100">
+                        <div class="card-header">
+                            <h5>We Value Your Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="feedbackName" class="form-label">Your Name (Optional)</label>
+                                    <input type="text" class="form-control" id="feedbackName"
+                                        placeholder="Enter your name">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="feedbackEmail" class="form-label">Your Email (Optional)</label>
+                                    <input type="email" class="form-control" id="feedbackEmail"
+                                        placeholder="Enter your email">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="feedbackMessage" class="form-label">Your Feedback</label>
+                                    <textarea class="form-control" id="feedbackMessage" rows="4"
+                                        placeholder="Write your feedback about the exam, experience, or any suggestions..."></textarea>
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-success px-5">
+                                        <i class="fas fa-paper-plane"></i> Submit Feedback
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const correct = parseInt(document.getElementById("correctAnswers").value);
+            const wrong = parseInt(document.getElementById("incorrectAnswers").value);
+
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correct', 'Incorrect'],
+                    datasets: [{
+                        data: [correct, wrong],
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Answer Distribution'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

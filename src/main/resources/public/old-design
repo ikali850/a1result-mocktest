@@ -1,0 +1,62 @@
+ <!-- Question Panel -->
+        <form id="questionForm">
+            <!-- Hidden correct answer -->
+            <input type="hidden" id="correctAnswerHidden" th:value="${question.correctAnswer}" />
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <!-- Question Title -->
+                    <h5 class="card-title" id="questionTitle" th:text="'Q' +  '. ' + ${question.questionTitle}">
+                        Question Title
+                    </h5>
+
+                    <!-- Options -->
+                    <div class="my-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="selectedOption" id="optionA" value="A">
+                            <label class="form-check-label" for="optionA" th:text="${question.optionA}">Option A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="selectedOption" id="optionB" value="B">
+                            <label class="form-check-label" for="optionB" th:text="${question.optionB}">Option B</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="selectedOption" id="optionC" value="C">
+                            <label class="form-check-label" for="optionC" th:text="${question.optionC}">Option C</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="selectedOption" id="optionD" value="D">
+                            <label class="form-check-label" for="optionD" th:text="${question.optionD}">Option D</label>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-right">
+                        <button type="button" disabled id="previousBtn" class="btn btn-info m-1">Previous</button>
+                        <button type="submit" id="nextBtn" class="btn btn-warning m-1">Next</button>
+                        <button type="button" id="submitBtn" class="btn btn-success m-1">Submit</button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+
+        <!-- Header Section -->
+        <div class="text-center bg-primary text-white p-4 rounded mb-4">
+            <h2 class="fw-bold" th:text="${examTitle}">Mock Exam Results</h2>
+            <p class="lead mt-2">
+                <strong th:text="${examDescription}">General Knowledge Mock Test</strong>
+            </p>
+
+            <div class="d-flex justify-content-center mt-3 gap-4 small">
+                <div>
+                    <i class="fas fa-hourglass-start me-1"></i>
+                    <span th:text="'Start: ' + ${startTimeFormatted}">Start Time</span>
+                </div>
+                <div>
+                    <i class="fas fa-hourglass-end me-1"></i>
+                    <span th:text="'End: ' + ${endTimeFormatted}">End Time</span>
+                </div>
+            </div>
+        </div>
