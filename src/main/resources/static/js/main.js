@@ -3,13 +3,11 @@ $(document).ready(function () {
     var totalQuestions = document.getElementById("totalQuestions").value;
 
     function showToast(message) {
-        // Set the message
         document.getElementById('toastMessage').textContent = message;
-
-        // Show the toast
         var toastElement = new bootstrap.Toast(document.getElementById('errorToast'));
         toastElement.show();
     }
+
     document.addEventListener('contextmenu', function (e) {
         e.preventDefault();
         showToast('Right-click is disabled!');
@@ -25,24 +23,25 @@ $(document).ready(function () {
     }
 
     function updateButtons() {
-        if (currentIndex <= 0) {
-            $("#previousBtn").prop("disabled", true);
-        } else {
-            $("#previousBtn").prop("disabled", false);
-        }
+        $("#previousBtn").prop("disabled", currentIndex <= 0);
     }
 
-    function toggleLoader() {
-        $('#loaderOverlay').toggle();
+    function showLoader() {
+        $('#loaderOverlay').show();
+    }
+
+    function hideLoader() {
+        $('#loaderOverlay').hide();
     }
 
     $('#questionForm').on('submit', function (e) {
         e.preventDefault();
-        toggleLoader();
+        showLoader();
+
         var selectedOption = $('input[name="selectedOption"]:checked').val();
         if (!selectedOption) {
             showToast('Please select an option!');
-            toggleLoader();
+            hideLoader();
             return;
         }
 
@@ -66,22 +65,23 @@ $(document).ready(function () {
                     if (currentIndex == totalQuestions - 1) {
                         $('#nextBtn').toggle();
                     }
-                    toggleLoader();
+                    hideLoader();
                 } else {
                     window.location.href = '/mock/test/submit';
-                    toggleLoader();
+                    hideLoader();
                 }
             },
             error: function (xhr, status, error) {
                 console.error('Error:', error);
                 showToast('Failed to save answer. Please try again!');
-                toggleLoader();
+                hideLoader();
             }
         });
     });
 
     $("#previousBtn").click(function () {
-        toggleLoader();
+        showLoader();
+
         $.ajax({
             url: '/mock/test/prevQuestion',
             method: 'GET',
@@ -90,7 +90,7 @@ $(document).ready(function () {
                 currentIndex--;
                 updateProgress();
                 updateButtons();
-                toggleLoader();
+                hideLoader();
                 if (currentIndex < totalQuestions - 1) {
                     $('#nextBtn').show();
                 }
@@ -98,7 +98,7 @@ $(document).ready(function () {
             error: function (xhr, status, error) {
                 console.error("Error fetching previous question:", error);
                 showToast('Failed to load previous question!');
-                toggleLoader();
+                hideLoader();
             }
         });
     });
@@ -119,6 +119,13 @@ $(document).ready(function () {
             showToast('Please select an option before submitting!');
             return;
         }
+
+        if (!confirm('Are you sure you want to submit the test?')) {
+            return;
+        }
+
+        showLoader();
+
         var data = {
             question: $('#questionTitle').text(),
             selectedOption: selectedOption,
@@ -131,13 +138,12 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function () {
-                // HTTP 200 reached — proceed with redirect
                 window.location.href = '/mock/test/submit';
             },
             error: function (xhr, status, error) {
                 console.error('Error:', error);
                 showToast('Failed to Submit answer. Please try again!');
-                toggleLoader();
+                hideLoader();
             }
         });
     });
