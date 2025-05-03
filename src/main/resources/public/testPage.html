@@ -59,18 +59,34 @@
             <div class="col-12">
                 <div class="card shadow-sm">
                     <div class="card-body d-flex flex-wrap justify-content-between">
+
                         <div><strong>Current Time:</strong> <span id="currentTime">--:--:--</span></div>
                         <div><strong>Remaining Time:</strong> <span id="remainingTime">--:--:--</span></div>
                         <div><strong>Total Questions:</strong> <span th:text="${totalQuestions}">0</span></div>
+
+                        <!-- Reset button -->
                         <div>
                             <a class="m-1 p-1 text-dark" th:href="@{/mock/test/reset(examName=${examTitle})}"
-                                role="button"><b>Reset</b></a>
+                                role="button">
+                                <b>Reset</b>
+                            </a>
                         </div>
 
+                        <!-- Language toggle button -->
+                        <div>
+                            <form action="/mock/test/changeLanguage" method="get" id="languageForm">
+                                <input type="hidden" name="examName" th:value="${examTitle}">
+                                <button type="button" class="btn btn-outline-primary" onclick="confirmLanguageChange()">
+                                    <span class="fw-bold" th:if="${session.lang == 'en'}">🌐 हिन्दी</span>
+                                    <span th:if="${session.lang == 'hi'}">🌐 English </span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="progress mb-2">
             <div id="progressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;"
                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
@@ -186,6 +202,7 @@
                 (secs < 10 ? '0' : '') + secs
             );
         }
+
 
         function updateTimer() {
             const timerElement = document.getElementById('remainingTime');

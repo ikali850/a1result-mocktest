@@ -2,6 +2,7 @@ package in.a1result.mockexam.controller;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,8 +41,18 @@ public class ExamTestController {
 
     @GetMapping("/{url}")
     public ModelAndView startTest(@PathVariable("url") String url, HttpSession session) {
-
         Exam examData = examService.getExamDataByUrl(url);
+        String lang = "en"; // default value
+
+        if (session != null) {
+            Object langAttr = session.getAttribute("lang");
+
+            if (langAttr instanceof String) {
+                lang = (String) langAttr;
+            } else {
+                session.setAttribute("lang", lang); // set default
+            }
+        }
 
         if (examData == null || examData.getQuestions() == null || examData.getQuestions().isEmpty()) {
             return new ModelAndView("errorPage");
@@ -53,8 +64,8 @@ public class ExamTestController {
         Collections.shuffle(questions);
 
         // Limit to 75 questions if more
-        if (questions.size() > 75) {
-            questions = questions.subList(0, 75);
+        if (questions.size() > 100) {
+            questions = questions.subList(0, 100);
         }
 
         // Save only question IDs separately
@@ -67,6 +78,18 @@ public class ExamTestController {
 
         // Prepare the first question
         Question firstQuestion = questions.get(0);
+
+        if (lang.equals("hi")) {
+            Question hindQuestion = new Question();
+            hindQuestion.setQuestionTitle(firstQuestion.getQuestionTitleHi());
+            hindQuestion.setCorrectAnswer(firstQuestion.getCorrectAnswerHi());
+            hindQuestion.setOptionA(firstQuestion.getOptionAHi());
+            hindQuestion.setOptionB(firstQuestion.getOptionBHi());
+            hindQuestion.setOptionC(firstQuestion.getOptionCHi());
+            hindQuestion.setOptionD(firstQuestion.getOptionDHi());
+            hindQuestion.setId(firstQuestion.getId());
+            firstQuestion = hindQuestion;
+        }
 
         // Calculate total test time (75 questions * 2 mins)
         int totalTestDurationSeconds = questions.size() * 2 * 60;
@@ -97,6 +120,9 @@ public class ExamTestController {
 
     @PostMapping("/saveAnswer")
     public ResponseEntity<?> saveUserAnswer(@RequestBody Answer answer, HttpSession session) {
+        // get language choice
+        String lang = (String) session.getAttribute("lang");
+
         if (answer.getCorrectAnswer().equals(answer.getSelectedOption())) {
             answer.setCorrect(true);
         } else {
@@ -132,6 +158,18 @@ public class ExamTestController {
         Long nextQuestionId = questionIds.get(questionIndex);
         Question nextQuestion = this.questionService.getQuestionById(nextQuestionId);
 
+        if (lang.equals("hi")) {
+            Question hindQuestion = new Question();
+            hindQuestion.setQuestionTitle(nextQuestion.getQuestionTitleHi());
+            hindQuestion.setCorrectAnswer(nextQuestion.getCorrectAnswerHi());
+            hindQuestion.setOptionA(nextQuestion.getOptionAHi());
+            hindQuestion.setOptionB(nextQuestion.getOptionBHi());
+            hindQuestion.setOptionC(nextQuestion.getOptionCHi());
+            hindQuestion.setOptionD(nextQuestion.getOptionDHi());
+            hindQuestion.setId(nextQuestion.getId());
+            nextQuestion = hindQuestion;
+        }
+
         // Update session with new index and answer list
         session.setAttribute("answerList", answerList);
         session.setAttribute("currentIndex", questionIndex);
@@ -157,7 +195,7 @@ public class ExamTestController {
 
         int totalAnswers = correctAnswer + incorrectAnswer;
         int percentage = (totalAnswers > 0) ? (correctAnswer * 100) / totalAnswers : 0;
-        String passFailResult = (percentage >= 50) ? "Passed" : "Failed";
+        String passFailResult = (percentage >= 50) ? "Pass" : "Fail";
 
         Long totalExamTime = Utils.getDifferenceInMinutes(startTime, endTime);
         String examTitle = examData.getExamTitle();
@@ -186,6 +224,7 @@ public class ExamTestController {
 
     @GetMapping("/prevQuestion")
     public Question prevQuestion(HttpSession session) {
+        String lang = (String) session.getAttribute("lang");
         List<Answer> answerList = (List<Answer>) session.getAttribute("answerList");
         List<Long> questionIds = (List<Long>) session.getAttribute("questionIds");
         int questionIndex = ((Integer) session.getAttribute("currentIndex"));
@@ -193,12 +232,31 @@ public class ExamTestController {
         // prepare question
         Long prevQuestionId = questionIds.get(questionIndex - 1);
         Question prevQuestion = this.questionService.getQuestionById(prevQuestionId);
+
+        if (lang.equals("hi")) {
+            Question hindQuestion = new Question();
+            hindQuestion.setQuestionTitle(prevQuestion.getQuestionTitleHi());
+            hindQuestion.setCorrectAnswer(prevQuestion.getCorrectAnswerHi());
+            hindQuestion.setOptionA(prevQuestion.getOptionAHi());
+            hindQuestion.setOptionB(prevQuestion.getOptionBHi());
+            hindQuestion.setOptionC(prevQuestion.getOptionCHi());
+            hindQuestion.setOptionD(prevQuestion.getOptionDHi());
+            hindQuestion.setId(prevQuestion.getId());
+            prevQuestion = hindQuestion;
+        }
         questionIndex--;
         // Update session with new index and answer list
         session.setAttribute("answerList", answerList);
         session.setAttribute("currentIndex", questionIndex);
         return prevQuestion;
 
+    }
+
+    @GetMapping("/changeLanguage")
+    public RedirectView changeLanguage(HttpSession session, @RequestParam("examName") String examName) {
+        String currentLang = (String) session.getAttribute("lang");
+        session.setAttribute("lang", "hi".equals(currentLang) ? "en" : "hi");
+        return new RedirectView("/mock/test/" + examName);
     }
 
     @GetMapping("/reset")

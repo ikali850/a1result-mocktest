@@ -141,7 +141,11 @@
                         </div>
 
                         <p class="h3" th:text="${percentage + '%'}">85%</p>
-                        <p class="lead text-success fw-bold" th:text="${resultStatus}"><b>Pass</b></p>
+                        <p class="lead fw-bold" th:text="${resultStatus}"
+                            th:classappend="${resultStatus == 'Pass' ? 'text-success' : 'text-danger'}">
+                            <b>Pass</b>
+                        </p>
+
                         <p>
                             <i class="fas fa-clock me-1"></i>
                             <span th:text="${totalExamTime} + ' Minutes'">45 Minutes</span>

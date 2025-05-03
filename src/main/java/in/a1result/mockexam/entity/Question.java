@@ -31,15 +31,21 @@ public class Question {
     @Column(nullable = false, length = 1000)
     private String questionTitle;
 
+    @Column(length = 1000)
+    private String questionTitleHi; // Hindi version
+
     private String optionA;
-
     private String optionB;
-
     private String optionC;
-
     private String optionD;
 
-    private String correctAnswer;
+    private String optionAHi; // Hindi
+    private String optionBHi;
+    private String optionCHi;
+    private String optionDHi;
+
+    private String correctAnswer; // English answer
+    private String correctAnswerHi; // Hindi answer
 
     private String selectedOption;
 
@@ -48,13 +54,15 @@ public class Question {
     @Column(length = 2000)
     private String explanation;
 
+    @Column(length = 2000)
+    private String explanationHi; // Hindi explanation
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_id") // optional but good practice
+    @JoinColumn(name = "exam_id")
     @JsonIgnore
     private Exam exam;
 
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
     @PrePersist

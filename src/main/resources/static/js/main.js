@@ -2,6 +2,24 @@ $(document).ready(function () {
     var currentIndex = document.getElementById("currentIndex").value;
     var totalQuestions = document.getElementById("totalQuestions").value;
 
+    // method to show alert to change lang
+    window.confirmLanguageChange = function () {
+        let currentNumber = parseInt($("#currentIndex").val(), 10); // convert to number
+        currentNumber++; // apply ++ operator
+
+        if (currentIndex =='0') {
+            // If incremented index is 1 or less, just submit
+            $("#languageForm").submit();
+            return;
+        }
+
+        // Otherwise, ask for confirmation
+        if (confirm("Change language? Saved answers will be lost.")) {
+            $("#languageForm").submit();
+        }
+    };
+
+
     function showToast(message) {
         document.getElementById('toastMessage').textContent = message;
         var toastElement = new bootstrap.Toast(document.getElementById('errorToast'));
