@@ -11,4 +11,5 @@ import in.a1result.mockexam.entity.Exam;
 public interface ExamRepo extends JpaRepository<Exam, Long> {
     
     Optional<Exam> findByUrl(String url);
+    Optional<Exam> findByExamTitle(String examTitle);
 }

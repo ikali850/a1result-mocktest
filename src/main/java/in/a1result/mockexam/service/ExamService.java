@@ -1,6 +1,7 @@
 package in.a1result.mockexam.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,17 @@ public class ExamService {
         existingExam.setActive(updatedExam.isActive());
 
         return examRepository.save(existingExam);
+    }
+
+    public Exam getExamByName(String examTitle) {
+        Optional<Exam> exam = this.examRepository.findByExamTitle(examTitle);
+        if (exam.isPresent()) {
+            System.out.println("found");
+        }
+        else{
+            System.out.println("not found");
+        }
+        return exam.orElse(null);
     }
 
     public void deleteExam(Long id) {

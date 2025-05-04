@@ -7,11 +7,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import in.a1result.mockexam.entity.Answer;
 import in.a1result.mockexam.entity.Exam;
+import in.a1result.mockexam.entity.Feedback;
 import in.a1result.mockexam.entity.Question;
+import in.a1result.mockexam.repositoy.FeedbackFormRepo;
 import in.a1result.mockexam.service.ExamService;
 import in.a1result.mockexam.service.QuestionService;
 import in.a1result.mockexam.utils.Utils;
@@ -28,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
@@ -38,6 +42,8 @@ public class ExamTestController {
     private ExamService examService;
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private FeedbackFormRepo feedbackFormRepo;
 
     @GetMapping("/{url}")
     public ModelAndView startTest(@PathVariable("url") String url, HttpSession session) {
@@ -257,6 +263,16 @@ public class ExamTestController {
         String currentLang = (String) session.getAttribute("lang");
         session.setAttribute("lang", "hi".equals(currentLang) ? "en" : "hi");
         return new RedirectView("/mock/test/" + examName);
+    }
+
+    @PostMapping("/feedback")
+    public ModelAndView submitFeedback(@ModelAttribute Feedback feedback) {
+        feedbackFormRepo.save(feedback);
+        Exam examData = this.examService.getExamByName(feedback.getExamName());
+        ModelAndView mv = new ModelAndView("thankyou");
+        mv.addObject("examUrl", examData.getUrl());
+        mv.addObject("examName", examData.getExamTitle());
+        return mv;
     }
 
     @GetMapping("/reset")

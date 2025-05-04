@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${examTitle}+' - exam.a1result.in '">Mock Test Result</title>
+    <link rel="icon" type="image/svg+xml" href="/img/default.svg">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -284,25 +285,112 @@
                             <h5>We Value Your Feedback</h5>
                         </div>
                         <div class="card-body">
-                            <form>
+                            <form th:action="@{/mock/test/feedback}" method="post">
+
+                                <!-- Exam Name (Read-only) -->
                                 <div class="mb-3">
-                                    <label for="feedbackName" class="form-label">Your Name (Optional)</label>
-                                    <input type="text" class="form-control" id="feedbackName"
-                                        placeholder="Enter your name">
+                                    <label for="examName" class="form-label fw-bold">Exam Name</label>
+                                    <input type="text" class="form-control bg-light" id="examName"
+                                        th:value="${examTitle}" name="examName" readonly>
                                 </div>
 
+                                <!-- Q1: Overall Test Experience -->
                                 <div class="mb-3">
-                                    <label for="feedbackEmail" class="form-label">Your Email (Optional)</label>
-                                    <input type="email" class="form-control" id="feedbackEmail"
-                                        placeholder="Enter your email">
+                                    <label class="form-label fw-bold">1. How would you rate this mock test
+                                        overall?</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="overallRating"
+                                                id="rating1" value="1" required>
+                                            <label class="form-check-label" for="rating1">1</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="overallRating"
+                                                id="rating2" value="2">
+                                            <label class="form-check-label" for="rating2">2</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="overallRating"
+                                                id="rating3" value="3">
+                                            <label class="form-check-label" for="rating3">3</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="overallRating"
+                                                id="rating4" value="4">
+                                            <label class="form-check-label" for="rating4">4</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="overallRating"
+                                                id="rating5" value="5">
+                                            <label class="form-check-label" for="rating5">5</label>
+                                        </div>
+                                    </div>
                                 </div>
 
+                                <!-- Q2: Question Quality -->
                                 <div class="mb-3">
-                                    <label for="feedbackMessage" class="form-label">Your Feedback</label>
-                                    <textarea class="form-control" id="feedbackMessage" rows="4"
+                                    <label class="form-label fw-bold">2. How accurate and relevant were the
+                                        questions?</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="questionQuality"
+                                                id="quality1" value="1" required>
+                                            <label class="form-check-label" for="quality1">1</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="questionQuality"
+                                                id="quality2" value="2">
+                                            <label class="form-check-label" for="quality2">2</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="questionQuality"
+                                                id="quality3" value="3">
+                                            <label class="form-check-label" for="quality3">3</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="questionQuality"
+                                                id="quality4" value="4">
+                                            <label class="form-check-label" for="quality4">4</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="questionQuality"
+                                                id="quality5" value="5">
+                                            <label class="form-check-label" for="quality5">5</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Q3: Difficulty Level -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">3. Was the difficulty level appropriate?</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="difficultyRating"
+                                                id="difficulty1" value="1" required>
+                                            <label class="form-check-label" for="difficulty1">1 (Too Easy)</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="difficultyRating"
+                                                id="difficulty2" value="2">
+                                            <label class="form-check-label" for="difficulty3">2 (Balanced)</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="difficultyRating"
+                                                id="difficulty3" value="3">
+                                            <label class="form-check-label" for="difficulty5">5 (Too Hard)</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Optional Comments -->
+                                <div class="mb-3">
+                                    <label for="feedbackMessage" class="form-label fw-bold">4. Additional
+                                        Comments</label>
+                                    <textarea class="form-control" id="feedbackMessage" name="comments" rows="4"
                                         placeholder="Write your feedback about the exam, experience, or any suggestions..."></textarea>
                                 </div>
 
+                                <!-- Submit Button -->
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-success px-5">
                                         <i class="fas fa-paper-plane"></i> Submit Feedback
@@ -310,6 +398,7 @@
                                 </div>
                             </form>
                         </div>
+
                     </div>
                 </div>
 
