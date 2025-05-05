@@ -2,10 +2,12 @@ package in.a1result.mockexam;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.TimeZone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication
 public class A1resultMockExamTestApplication {
@@ -17,4 +19,8 @@ public class A1resultMockExamTestApplication {
 		System.out.println("started...");
 	}
 
+	@PostConstruct
+	public void init() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
+	}
 }
