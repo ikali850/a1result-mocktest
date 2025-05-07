@@ -176,18 +176,29 @@
 
         <!-- Detailed Performance Section -->
         <div class="row mb-2">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card result-card text-center">
                     <div class="card-header">
                         <h5>Questions Attempted</h5>
                     </div>
                     <div class="card-body">
                         <p class="h3" th:text="${attemptedQuestions}">20</p>
-                        <i class="fas fa-check-circle text-success" style="font-size: 40px;"></i>
+                        <i class="fas fa-clipboard-check text-primary" style="font-size: 40px;" title="Attempted"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="card result-card text-center">
+                    <div class="card-header">
+                        <h5>Skipped Questions</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="h3" th:text="${skippedQuestion}">15</p>
+                        <i class="fas fa-ban text-warning" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="card result-card text-center">
                     <div class="card-header">
                         <h5>Correct Answers</h5>
@@ -198,7 +209,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card result-card text-center">
                     <div class="card-header">
                         <h5>Incorrect Answers</h5>

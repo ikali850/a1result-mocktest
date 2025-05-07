@@ -194,6 +194,7 @@ public class ExamTestController {
 
         int totalQuestion = questionIds.size();
         int attemptedQuestionSize = answersList.size();
+        int skippedQuestions = totalQuestion - attemptedQuestionSize;
 
         Map<String, Integer> result = Utils.countCorrectAndWrong(answersList);
         int correctAnswer = result.get("correct");
@@ -212,6 +213,7 @@ public class ExamTestController {
 
         mv.addObject("totalQuestions", totalQuestion);
         mv.addObject("attemptedQuestions", attemptedQuestionSize);
+        mv.addObject("skippedQuestion", skippedQuestions);
         mv.addObject("correctAnswers", correctAnswer);
         mv.addObject("incorrectAnswers", incorrectAnswer);
         mv.addObject("percentage", percentage);
