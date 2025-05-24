@@ -97,8 +97,8 @@ public class ExamTestController {
             firstQuestion = hindQuestion;
         }
 
-        // Calculate total test time (75 questions * 2 mins)
-        int totalTestDurationSeconds = questions.size() * 2 * 60;
+        // Calculate total test time (100 questions * 1 mins)
+        int totalTestDurationSeconds = questions.size() * 1 * 60;
 
         // remove all the question store only question ids
         questions.clear();
