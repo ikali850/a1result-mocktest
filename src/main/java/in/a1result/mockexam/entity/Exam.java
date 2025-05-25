@@ -29,15 +29,17 @@ public class Exam {
 
     private String examTitle;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String url;
 
     @Column(length = 1000)
     private String examDescription;
 
-    private Integer durationMinutes; 
+    private Integer durationMinutes;
 
     private boolean active = true;
+
+    private int questionTimeLimit;
 
     private LocalDateTime createdAt;
 

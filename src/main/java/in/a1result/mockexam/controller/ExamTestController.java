@@ -96,9 +96,17 @@ public class ExamTestController {
             hindQuestion.setId(firstQuestion.getId());
             firstQuestion = hindQuestion;
         }
+        int totalTestDurationSeconds;
 
-        // Calculate total test time (100 questions * 1 mins)
-        int totalTestDurationSeconds = questions.size() * 1 * 60;
+        if (examData.getQuestionTimeLimit() > 0 && examData.getQuestionTimeLimit() <= 10) {
+            int timeLimit = examData.getQuestionTimeLimit();
+            totalTestDurationSeconds = questions.size() * timeLimit * 60;
+        } else {
+            // Default time limit of 1 minute per question
+            // Calculate total test time (100 questions * 1 mins)
+            totalTestDurationSeconds = questions.size() * 1 * 60;
+
+        }
 
         // remove all the question store only question ids
         questions.clear();
